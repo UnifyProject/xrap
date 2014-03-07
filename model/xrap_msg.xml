@@ -1,0 +1,12 @@
+<class name = "xrap_msg" signature = "1" title = "XRAP serialization">
+A C implementation of UnifyProject/draft/RFC-4.
+<include filename = "license.xml" />
+
+<message name = "method" id = "1">
+    <field name = "whatever" type = "string" />
+    <field name = "headers" type = "dictionary" />
+    <field name = "content" type = "frame" />
+Some description.
+</message>
+
+</class>
