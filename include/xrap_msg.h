@@ -1,5 +1,5 @@
 /*  =========================================================================
-    xrap_msg - xrap serialization over zmtp
+    xrap_msg - XRAP serialization over ZMTP
     
     Generated codec header for xrap_msg
     -------------------------------------------------------------------------

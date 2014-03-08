@@ -25,3 +25,6 @@ src/xrap_msg.lo
 src/xrap_msg.o
 src/xrap_selftest
 src/xrap_selftest.o
+src/test-suite.log
+src/xrap_selftest.log
+src/xrap_selftest.trs

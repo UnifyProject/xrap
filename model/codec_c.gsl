@@ -7,7 +7,7 @@
 .echo "Generating ../include/$(class.name).h..."
 .output "../include/$(class.name).h"
 /*  =========================================================================
-    $(class.name) - $(class.title)
+    $(class.name) - $(class.title:)
     
     Generated codec header for $(class.name)
     -------------------------------------------------------------------------
@@ -241,7 +241,7 @@ int
 .echo "Generating ../src/$(class.name).c..."
 .output "../src/$(class.name).c"
 /*  =========================================================================
-    $(class.name) - $(class.title)
+    $(class.name) - $(class.title:)
 
     Generated codec implementation for $(class.name)
     -------------------------------------------------------------------------
@@ -251,7 +251,7 @@ int
 
 /*
 @header
-    $(class.name) - $(class.title)
+    $(class.name) - $(class.title:)
 @discuss
 @end
 */

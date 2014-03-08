@@ -1,5 +1,5 @@
 /*  =========================================================================
-    xrap_msg - xrap serialization over zmtp
+    xrap_msg - XRAP serialization over ZMTP
 
     Generated codec implementation for xrap_msg
     -------------------------------------------------------------------------
@@ -28,7 +28,7 @@
 
 /*
 @header
-    xrap_msg - xrap serialization over zmtp
+    xrap_msg - XRAP serialization over ZMTP
 @discuss
 @end
 */
@@ -251,7 +251,7 @@ xrap_msg_recv (void *input)
         self->ceiling = self->needle + zframe_size (frame);
         uint16_t signature;
         GET_NUMBER2 (signature);
-        if (signature == (0xAAA0 | 1))
+        if (signature == (0xAAA0 | 5))
             break;                  //  Valid signature
 
         //  Protocol assertion, drop message
@@ -518,7 +518,7 @@ xrap_msg_send (xrap_msg_t **self_p, void *output)
     self->needle = zframe_data (frame);
     size_t string_size;
     int frame_flags = 0;
-    PUT_NUMBER2 (0xAAA0 | 1);
+    PUT_NUMBER2 (0xAAA0 | 5);
     PUT_NUMBER1 (self->id);
 
     switch (self->id) {
