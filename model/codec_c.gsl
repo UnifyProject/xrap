@@ -7,7 +7,7 @@
 .echo "Generating ../include/$(class.name).h..."
 .output "../include/$(class.name).h"
 /*  =========================================================================
-    $(class.name) - $(class.title)
+    $(class.name) - $(class.title:)
     
     Generated codec header for $(class.name)
     -------------------------------------------------------------------------
@@ -18,7 +18,7 @@
 #ifndef __$(CLASS.NAME)_H_INCLUDED__
 #define __$(CLASS.NAME)_H_INCLUDED__
 
-/*  These are the $(class.name) messages
+/*  These are the $(class.name) messages:
 .for message
 .   message.name = "$(message.name:c)"
 .   for field where item() = 1
@@ -35,12 +35,12 @@
 .       endfor
 .   endfor
 .
+
     $(NAME) - $(string.trim (.?''):left)
 .   for field
 .       field.name = "$(field.name:c)"
 .       if type = "number"
 .           size ?= 8
-        $(name)       $(type) $(size)
 .           if size = 1
 .               field.ctype = "byte"
 .           elsif size = 2
@@ -52,10 +52,13 @@
 .           else
 .               echo "E: bad size $(size) for $(name)"
 .           endif
+        $(name)             $(type) $(size)\
+                                        $(field.?'':)
 .       elsif type = "octets"
-        $(name)       $(type) [$(size)]
+        $(name)             $(type) [$(size)]\
+                                        $(field.?'':)
 .       else
-        $(name)       $(type)
+        $(name)             $(type)     $(field.?'':)
 .       endif
 .       for class.field as cfield where cfield.name = field.name
 .           if cfield.type <> field.type
@@ -238,7 +241,7 @@ int
 .echo "Generating ../src/$(class.name).c..."
 .output "../src/$(class.name).c"
 /*  =========================================================================
-    $(class.name) - $(class.title)
+    $(class.name) - $(class.title:)
 
     Generated codec implementation for $(class.name)
     -------------------------------------------------------------------------
@@ -248,7 +251,7 @@ int
 
 /*
 @header
-    $(class.name) - $(class.title)
+    $(class.name) - $(class.title:)
 @discuss
 @end
 */
@@ -458,7 +461,6 @@ $(class.name)_recv (void *input)
     $(class.name)_t *self = $(class.name)_new (0);
     zframe_t *frame = NULL;
     size_t string_size;
-    size_t hash_size;
 
     //  Read valid message frame from socket; we loop over any
     //  garbage data we might receive from badly-connected peers
@@ -526,6 +528,7 @@ $(class.name)_recv (void *input)
                 free (string);
             }
 .       elsif type = "dictionary"
+            size_t hash_size;
             GET_NUMBER1 (hash_size);
             self->$(name) = zhash_new ();
             zhash_autofree (self->$(name));
@@ -821,6 +824,7 @@ $(class.name)_dup ($(class.name)_t *self)
     $(class.name)_t *copy = $(class.name)_new (self->id);
     if (self->address)
         copy->address = zframe_dup (self->address);
+
     switch (self->id) {
 .for class.message
         case $(CLASS.NAME)_$(MESSAGE.NAME):
