@@ -834,15 +834,15 @@ $(class.name)_dup ($(class.name)_t *self)
 .       elsif type = "octets"
             memcpy (copy->$(name), self->$(name), $(size));
 .       elsif type = "string"
-            copy->$(name) = strdup (self->$(name));
+            copy->$(name) = self->$(name)? strdup (self->$(name)): NULL;
 .       elsif type = "strings"
-            copy->$(name) = zlist_dup (self->$(name));
+            copy->$(name) = self->$(name)? zlist_dup (self->$(name)): NULL;
 .       elsif type = "dictionary"
-            copy->$(name) = zhash_dup (self->$(name));
+            copy->$(name) = self->$(name)? zhash_dup (self->$(name)): NULL;
 .       elsif type = "frame"
-            copy->$(name) = zframe_dup (self->$(name));
+            copy->$(name) = self->$(name)? zframe_dup (self->$(name)): NULL;
 .       elsif type = "msg"
-            copy->$(name) = zmsg_dup (self->$(name));
+            copy->$(name) = self->$(name)? zmsg_dup (self->$(name)): NULL;
 .       endif
 .   endfor
             break;
@@ -1265,8 +1265,13 @@ $(class.name)_test (bool verbose)
     
     //  Encode/send/decode and verify each message type
 .for class.message
-
     self = $(class.name)_new ($(CLASS.NAME)_$(MESSAGE.NAME));
+    
+    //  Check that _dup works on empty message
+    $(class.name)_t *copy = $(class.name)_dup (self);
+    assert (copy);
+    $(class.name)_destroy (&copy);
+
 .   for field where !defined (value)
 .       if type = "number"
     $(class.name)_set_$(name) (self, 123);
