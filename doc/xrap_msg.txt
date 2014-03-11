@@ -3,7 +3,7 @@ xrap_msg(3)
 
 NAME
 ----
-xrap_msg - xrap serialization
+xrap_msg - XRAP serialization over ZMTP
 
 SYNOPSIS
 --------
@@ -24,12 +24,77 @@ xrap_msg_t *
 int
     xrap_msg_send (xrap_msg_t **self_p, void *output);
 
-//  Send the METHOD to the output in one step
+//  Send the POST to the output in one step
 int
-    xrap_msg_send_method (void *output,
-        char *whatever,
-        zhash_t *headers,
-        zframe_t *content);
+    xrap_msg_send_post (void *output,
+        char *parent,
+        char *content_type,
+        zframe_t *content_body);
+    
+//  Send the POST_OK to the output in one step
+int
+    xrap_msg_send_post_ok (void *output,
+        uint16_t status_code,
+        char *location,
+        char *etag,
+        uint64_t date_modified,
+        char *content_type,
+        zframe_t *content_body);
+    
+//  Send the GET to the output in one step
+int
+    xrap_msg_send_get (void *output,
+        char *resource,
+        uint64_t if_modified_since,
+        char *if_none_match,
+        char *content_type);
+    
+//  Send the GET_OK to the output in one step
+int
+    xrap_msg_send_get_ok (void *output,
+        uint16_t status_code,
+        char *content_type,
+        zframe_t *content_body);
+    
+//  Send the GET_EMPTY to the output in one step
+int
+    xrap_msg_send_get_empty (void *output,
+        uint16_t status_code);
+    
+//  Send the PUT to the output in one step
+int
+    xrap_msg_send_put (void *output,
+        char *resource,
+        uint64_t if_unmodified_since,
+        char *if_match,
+        char *content_type,
+        zframe_t *content_body);
+    
+//  Send the PUT_OK to the output in one step
+int
+    xrap_msg_send_put_ok (void *output,
+        uint16_t status_code,
+        char *location,
+        char *etag,
+        uint64_t date_modified);
+    
+//  Send the DELETE to the output in one step
+int
+    xrap_msg_send_delete (void *output,
+        char *resource,
+        uint64_t if_unmodified_since,
+        char *if_match);
+    
+//  Send the DELETE_OK to the output in one step
+int
+    xrap_msg_send_delete_ok (void *output,
+        uint16_t status_code);
+    
+//  Send the ERROR to the output in one step
+int
+    xrap_msg_send_error (void *output,
+        uint16_t status_code,
+        char *status_text);
     
 //  Duplicate the xrap_msg message
 xrap_msg_t *
@@ -53,33 +118,83 @@ void
 char *
     xrap_msg_command (xrap_msg_t *self);
 
-//  Get/set the whatever field
+//  Get/set the parent field
 char *
-    xrap_msg_whatever (xrap_msg_t *self);
+    xrap_msg_parent (xrap_msg_t *self);
 void
-    xrap_msg_set_whatever (xrap_msg_t *self, char *format, ...);
+    xrap_msg_set_parent (xrap_msg_t *self, char *format, ...);
 
-//  Get/set the headers field
-zhash_t *
-    xrap_msg_headers (xrap_msg_t *self);
-void
-    xrap_msg_set_headers (xrap_msg_t *self, zhash_t *headers);
-    
-//  Get/set a value in the headers dictionary
+//  Get/set the content_type field
 char *
-    xrap_msg_headers_string (xrap_msg_t *self, char *key, char *default_value);
-uint64_t
-    xrap_msg_headers_number (xrap_msg_t *self, char *key, uint64_t default_value);
+    xrap_msg_content_type (xrap_msg_t *self);
 void
-    xrap_msg_headers_insert (xrap_msg_t *self, char *key, char *format, ...);
-size_t
-    xrap_msg_headers_size (xrap_msg_t *self);
+    xrap_msg_set_content_type (xrap_msg_t *self, char *format, ...);
 
-//  Get/set the content field
+//  Get/set the content_body field
 zframe_t *
-    xrap_msg_content (xrap_msg_t *self);
+    xrap_msg_content_body (xrap_msg_t *self);
 void
-    xrap_msg_set_content (xrap_msg_t *self, zframe_t *frame);
+    xrap_msg_set_content_body (xrap_msg_t *self, zframe_t *frame);
+
+//  Get/set the status_code field
+uint16_t
+    xrap_msg_status_code (xrap_msg_t *self);
+void
+    xrap_msg_set_status_code (xrap_msg_t *self, uint16_t status_code);
+
+//  Get/set the location field
+char *
+    xrap_msg_location (xrap_msg_t *self);
+void
+    xrap_msg_set_location (xrap_msg_t *self, char *format, ...);
+
+//  Get/set the etag field
+char *
+    xrap_msg_etag (xrap_msg_t *self);
+void
+    xrap_msg_set_etag (xrap_msg_t *self, char *format, ...);
+
+//  Get/set the date_modified field
+uint64_t
+    xrap_msg_date_modified (xrap_msg_t *self);
+void
+    xrap_msg_set_date_modified (xrap_msg_t *self, uint64_t date_modified);
+
+//  Get/set the resource field
+char *
+    xrap_msg_resource (xrap_msg_t *self);
+void
+    xrap_msg_set_resource (xrap_msg_t *self, char *format, ...);
+
+//  Get/set the if_modified_since field
+uint64_t
+    xrap_msg_if_modified_since (xrap_msg_t *self);
+void
+    xrap_msg_set_if_modified_since (xrap_msg_t *self, uint64_t if_modified_since);
+
+//  Get/set the if_none_match field
+char *
+    xrap_msg_if_none_match (xrap_msg_t *self);
+void
+    xrap_msg_set_if_none_match (xrap_msg_t *self, char *format, ...);
+
+//  Get/set the if_unmodified_since field
+uint64_t
+    xrap_msg_if_unmodified_since (xrap_msg_t *self);
+void
+    xrap_msg_set_if_unmodified_since (xrap_msg_t *self, uint64_t if_unmodified_since);
+
+//  Get/set the if_match field
+char *
+    xrap_msg_if_match (xrap_msg_t *self);
+void
+    xrap_msg_set_if_match (xrap_msg_t *self, char *format, ...);
+
+//  Get/set the status_text field
+char *
+    xrap_msg_status_text (xrap_msg_t *self);
+void
+    xrap_msg_set_status_text (xrap_msg_t *self, char *format, ...);
 
 //  Self test of this class
 int
@@ -89,7 +204,7 @@ int
 DESCRIPTION
 -----------
 
-xrap_msg - xrap serialization
+xrap_msg - XRAP serialization over ZMTP
 
 
 EXAMPLE
@@ -114,20 +229,138 @@ EXAMPLE
     
     //  Encode/send/decode and verify each message type
 
-    self = xrap_msg_new (XRAP_MSG_METHOD);
-    xrap_msg_set_whatever (self, "Life is short but Now lasts for ever");
-    xrap_msg_headers_insert (self, "Name", "Brutus");
-    xrap_msg_headers_insert (self, "Age", "%d", 43);
-    xrap_msg_set_content (self, zframe_new ("Captcha Diem", 12));
+    self = xrap_msg_new (XRAP_MSG_POST);
+    xrap_msg_set_parent (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
     xrap_msg_send (&self, output);
     
     self = xrap_msg_recv (input);
     assert (self);
-    assert (streq (xrap_msg_whatever (self), "Life is short but Now lasts for ever"));
-    assert (xrap_msg_headers_size (self) == 2);
-    assert (streq (xrap_msg_headers_string (self, "Name", "?"), "Brutus"));
-    assert (xrap_msg_headers_number (self, "Age", 0) == 43);
-    assert (zframe_streq (xrap_msg_content (self), "Captcha Diem"));
+    assert (streq (xrap_msg_parent (self), "Life is short but Now lasts for ever"));
+    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_POST_OK);
+    xrap_msg_set_status_code (self, 123);
+    xrap_msg_set_location (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_etag (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_date_modified (self, 123);
+    xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (xrap_msg_status_code (self) == 123);
+    assert (streq (xrap_msg_location (self), "Life is short but Now lasts for ever"));
+    assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
+    assert (xrap_msg_date_modified (self) == 123);
+    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_GET);
+    xrap_msg_set_resource (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_if_modified_since (self, 123);
+    xrap_msg_set_if_none_match (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
+    assert (xrap_msg_if_modified_since (self) == 123);
+    assert (streq (xrap_msg_if_none_match (self), "Life is short but Now lasts for ever"));
+    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_GET_OK);
+    xrap_msg_set_status_code (self, 123);
+    xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (xrap_msg_status_code (self) == 123);
+    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_GET_EMPTY);
+    xrap_msg_set_status_code (self, 123);
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (xrap_msg_status_code (self) == 123);
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_PUT);
+    xrap_msg_set_resource (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_if_unmodified_since (self, 123);
+    xrap_msg_set_if_match (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
+    assert (xrap_msg_if_unmodified_since (self) == 123);
+    assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
+    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_PUT_OK);
+    xrap_msg_set_status_code (self, 123);
+    xrap_msg_set_location (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_etag (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_date_modified (self, 123);
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (xrap_msg_status_code (self) == 123);
+    assert (streq (xrap_msg_location (self), "Life is short but Now lasts for ever"));
+    assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
+    assert (xrap_msg_date_modified (self) == 123);
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_DELETE);
+    xrap_msg_set_resource (self, "Life is short but Now lasts for ever");
+    xrap_msg_set_if_unmodified_since (self, 123);
+    xrap_msg_set_if_match (self, "Life is short but Now lasts for ever");
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
+    assert (xrap_msg_if_unmodified_since (self) == 123);
+    assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_DELETE_OK);
+    xrap_msg_set_status_code (self, 123);
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (xrap_msg_status_code (self) == 123);
+    xrap_msg_destroy (&self);
+
+    self = xrap_msg_new (XRAP_MSG_ERROR);
+    xrap_msg_set_status_code (self, 123);
+    xrap_msg_set_status_text (self, "Life is short but Now lasts for ever");
+    xrap_msg_send (&self, output);
+    
+    self = xrap_msg_recv (input);
+    assert (self);
+    assert (xrap_msg_status_code (self) == 123);
+    assert (streq (xrap_msg_status_text (self), "Life is short but Now lasts for ever"));
     xrap_msg_destroy (&self);
 
     zctx_destroy (&ctx);
