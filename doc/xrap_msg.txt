@@ -24,6 +24,10 @@ xrap_msg_t *
 int
     xrap_msg_send (xrap_msg_t **self_p, void *output);
 
+//  Send the xrap_msg to the output, and do not destroy it
+int
+    xrap_msg_send_again (xrap_msg_t *self, void *output);
+
 //  Send the POST to the output in one step
 int
     xrap_msg_send_post (void *output,
@@ -104,11 +108,11 @@ xrap_msg_t *
 void
     xrap_msg_dump (xrap_msg_t *self);
 
-//  Get/set the message address
+//  Get/set the message routing id
 zframe_t *
-    xrap_msg_address (xrap_msg_t *self);
+    xrap_msg_routing_id (xrap_msg_t *self);
 void
-    xrap_msg_set_address (xrap_msg_t *self, zframe_t *address);
+    xrap_msg_set_routing_id (xrap_msg_t *self, zframe_t *routing_id);
 
 //  Get the xrap_msg id and printable command
 int
@@ -228,140 +232,242 @@ EXAMPLE
     zsocket_connect (input, "inproc://selftest");
     
     //  Encode/send/decode and verify each message type
-
+    int instance;
+    xrap_msg_t *copy;
     self = xrap_msg_new (XRAP_MSG_POST);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_parent (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (streq (xrap_msg_parent (self), "Life is short but Now lasts for ever"));
-    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (streq (xrap_msg_parent (self), "Life is short but Now lasts for ever"));
+        assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_POST_OK);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_status_code (self, 123);
     xrap_msg_set_location (self, "Life is short but Now lasts for ever");
     xrap_msg_set_etag (self, "Life is short but Now lasts for ever");
     xrap_msg_set_date_modified (self, 123);
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (xrap_msg_status_code (self) == 123);
-    assert (streq (xrap_msg_location (self), "Life is short but Now lasts for ever"));
-    assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
-    assert (xrap_msg_date_modified (self) == 123);
-    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (xrap_msg_status_code (self) == 123);
+        assert (streq (xrap_msg_location (self), "Life is short but Now lasts for ever"));
+        assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
+        assert (xrap_msg_date_modified (self) == 123);
+        assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_GET);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_resource (self, "Life is short but Now lasts for ever");
     xrap_msg_set_if_modified_since (self, 123);
     xrap_msg_set_if_none_match (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
-    assert (xrap_msg_if_modified_since (self) == 123);
-    assert (streq (xrap_msg_if_none_match (self), "Life is short but Now lasts for ever"));
-    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
+        assert (xrap_msg_if_modified_since (self) == 123);
+        assert (streq (xrap_msg_if_none_match (self), "Life is short but Now lasts for ever"));
+        assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_GET_OK);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_status_code (self, 123);
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (xrap_msg_status_code (self) == 123);
-    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (xrap_msg_status_code (self) == 123);
+        assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_GET_EMPTY);
-    xrap_msg_set_status_code (self, 123);
-    xrap_msg_send (&self, output);
     
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (xrap_msg_status_code (self) == 123);
-    xrap_msg_destroy (&self);
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
 
+    xrap_msg_set_status_code (self, 123);
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
+    xrap_msg_send (&self, output);
+
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (xrap_msg_status_code (self) == 123);
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_PUT);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_resource (self, "Life is short but Now lasts for ever");
     xrap_msg_set_if_unmodified_since (self, 123);
     xrap_msg_set_if_match (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
-    assert (xrap_msg_if_unmodified_since (self) == 123);
-    assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
-    assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-    assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
+        assert (xrap_msg_if_unmodified_since (self) == 123);
+        assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
+        assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
+        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_PUT_OK);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_status_code (self, 123);
     xrap_msg_set_location (self, "Life is short but Now lasts for ever");
     xrap_msg_set_etag (self, "Life is short but Now lasts for ever");
     xrap_msg_set_date_modified (self, 123);
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (xrap_msg_status_code (self) == 123);
-    assert (streq (xrap_msg_location (self), "Life is short but Now lasts for ever"));
-    assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
-    assert (xrap_msg_date_modified (self) == 123);
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (xrap_msg_status_code (self) == 123);
+        assert (streq (xrap_msg_location (self), "Life is short but Now lasts for ever"));
+        assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
+        assert (xrap_msg_date_modified (self) == 123);
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_DELETE);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_resource (self, "Life is short but Now lasts for ever");
     xrap_msg_set_if_unmodified_since (self, 123);
     xrap_msg_set_if_match (self, "Life is short but Now lasts for ever");
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
-    assert (xrap_msg_if_unmodified_since (self) == 123);
-    assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
-    xrap_msg_destroy (&self);
 
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (streq (xrap_msg_resource (self), "Life is short but Now lasts for ever"));
+        assert (xrap_msg_if_unmodified_since (self) == 123);
+        assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_DELETE_OK);
-    xrap_msg_set_status_code (self, 123);
-    xrap_msg_send (&self, output);
     
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (xrap_msg_status_code (self) == 123);
-    xrap_msg_destroy (&self);
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
 
+    xrap_msg_set_status_code (self, 123);
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
+    xrap_msg_send (&self, output);
+
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (xrap_msg_status_code (self) == 123);
+        xrap_msg_destroy (&self);
+    }
     self = xrap_msg_new (XRAP_MSG_ERROR);
+    
+    //  Check that _dup works on empty message
+    copy = xrap_msg_dup (self);
+    assert (copy);
+    xrap_msg_destroy (&copy);
+
     xrap_msg_set_status_code (self, 123);
     xrap_msg_set_status_text (self, "Life is short but Now lasts for ever");
+    //  Send twice from same object
+    xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
-    
-    self = xrap_msg_recv (input);
-    assert (self);
-    assert (xrap_msg_status_code (self) == 123);
-    assert (streq (xrap_msg_status_text (self), "Life is short but Now lasts for ever"));
-    xrap_msg_destroy (&self);
+
+    for (instance = 0; instance < 2; instance++) {
+        self = xrap_msg_recv (input);
+        assert (self);
+        
+        assert (xrap_msg_status_code (self) == 123);
+        assert (streq (xrap_msg_status_text (self), "Life is short but Now lasts for ever"));
+        xrap_msg_destroy (&self);
+    }
 
     zctx_destroy (&ctx);
 ----
