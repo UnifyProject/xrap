@@ -1,0 +1,84 @@
+The following ABNF grammar defines the XRAP serialization over ZMTP:
+
+    xrap_msg        = *( C:post | C:post_ok | C:get | C:get_ok | C:get_empty | C:put | C:put_ok | C:delete | C:delete_ok | C:error )
+
+    C:post          = signature %d1 parent content_type content_body
+    signature       = %xAA %d5              ; two octets
+    parent          = string                ; Schema/type/name
+    content_type    = string                ; Content type
+    content_body    = longstr               ; New resource specification
+
+    C:post_ok       = signature %d2 status_code location etag date_modified content_type content_body
+    status_code     = number-2              ; Response status code 2xx
+    location        = string                ; Schema/type/name
+    etag            = string                ; Opaque hash tag
+    date_modified   = number-8              ; Date and time modified
+    content_type    = string                ; Content type
+    content_body    = longstr               ; Resource contents
+
+    C:get           = signature %d3 resource if_modified_since if_none_match content_type
+    resource        = string                ; Schema/type/name
+    if_modified_since  = number-8           ; GET if more recent
+    if_none_match   = string                ; GET if changed
+    content_type    = string                ; Desired content type
+
+    C:get_ok        = signature %d4 status_code content_type content_body
+    status_code     = number-2              ; Response status code 2xx
+    content_type    = string                ; Actual content type
+    content_body    = longstr               ; Resource specification
+
+    C:get_empty     = signature %d5 status_code
+    status_code     = number-2              ; Response status code 3xx
+
+    C:put           = signature %d6 resource if_unmodified_since if_match content_type content_body
+    resource        = string                ; Schema/type/name
+    if_unmodified_since  = number-8         ; Update if same date
+    if_match        = string                ; Update if same ETag
+    content_type    = string                ; Content type
+    content_body    = longstr               ; New resource specification
+
+    C:put_ok        = signature %d7 status_code location etag date_modified
+    status_code     = number-2              ; Response status code 2xx
+    location        = string                ; Schema/type/name
+    etag            = string                ; Opaque hash tag
+    date_modified   = number-8              ; Date and time modified
+
+    C:delete        = signature %d8 resource if_unmodified_since if_match
+    resource        = string                ; schema/type/name
+    if_unmodified_since  = number-8         ; DELETE if same date
+    if_match        = string                ; DELETE if same ETag
+
+    C:delete_ok     = signature %d9 status_code
+    status_code     = number-2              ; Response status code 2xx
+
+    C:error         = signature %d10 status_code status_text
+    status_code     = number-2              ; Response status code, 4xx or 5xx
+    status_text     = string                ; Response status text
+
+    ; Numbers are unsigned integers in network byte order
+    number-1        = 1OCTET
+    number-2        = 2OCTET
+    number-4        = 4OCTET
+    number-8        = 8OCTET
+    
+    ; Strings are always length + text contents
+    string          = number-1 *VCHAR
+    longstr         = number-4 *VCHAR
+
+    ; A list of string values
+    strings         = count *value
+    value           = longstr
+
+    ; A list of name/value pairs
+    dictionary      = count *( name value )
+    count           = number-4
+    name            = string                   
+
+    ; A chunk has 4-octet length + binary contents
+    chunk           = number-4 *OCTET
+
+    ; A frame is zero or more octets encoded as a ZeroMQ frame
+    frame           = *OCTET                
+
+    ; A msg is zero or more distinct frames
+    msg             = *frame
