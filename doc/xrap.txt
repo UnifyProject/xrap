@@ -24,4 +24,4 @@ EXAMPLE
 
 SEE ALSO
 --------
-linkxrap:xrap_msg[7]
+linkxrap:xrap_msg[3]

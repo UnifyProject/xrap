@@ -5,7 +5,7 @@ Message structures for XRAP over ZMTP, UnifyProject/draft/RFC-4.
 <message name = "POST" id = "1">
     <field name = "parent" type = "string">Schema/type/name</field>
     <field name = "content type" type = "string">Content type</field>
-    <field name = "content body" type = "frame">New resource specification</field>
+    <field name = "content body" type = "longstr">New resource specification</field>
 Create a new, dynamically named resource in some parent.
 </message>
 
@@ -13,9 +13,9 @@ Create a new, dynamically named resource in some parent.
     <field name = "status code" type = "number" size = "2">Response status code 2xx</field>
     <field name = "location" type = "string">Schema/type/name</field>
     <field name = "etag" type = "string">Opaque hash tag</field>
-    <field name = "date modified" type = "number" size="8">Date and time modified</field>
+    <field name = "date modified" type = "number" size = "8">Date and time modified</field>
     <field name = "content type" type = "string">Content type</field>
-    <field name = "content body" type = "frame">Resource contents</field>
+    <field name = "content body" type = "longstr">Resource contents</field>
 Success response for POST.
 </message>
 
@@ -30,7 +30,7 @@ Retrieve a known resource.
 <message name = "GET OK" id = "4">
     <field name = "status code" type = "number" size = "2">Response status code 2xx</field>
     <field name = "content type" type = "string">Actual content type</field>
-    <field name = "content body" type = "frame">Resource specification</field>
+    <field name = "content body" type = "longstr">Resource specification</field>
 Success response for GET.
 </message>
 
@@ -44,7 +44,7 @@ Conditional GET returned 304 Not Modified.
     <field name = "if unmodified since" type = "number" size="8">Update if same date</field>
     <field name = "if match" type = "string">Update if same ETag</field>
     <field name = "content type" type = "string">Content type</field>
-    <field name = "content body" type = "frame">New resource specification</field>
+    <field name = "content body" type = "longstr">New resource specification</field>
 Update a known resource.
 </message>
 
@@ -52,7 +52,7 @@ Update a known resource.
     <field name = "status code" type = "number" size = "2">Response status code 2xx</field>
     <field name = "location" type = "string">Schema/type/name</field>
     <field name = "etag" type = "string">Opaque hash tag</field>
-    <field name = "date modified" type = "number" size="8">Date and time modified</field>
+    <field name = "date modified" type = "number" size = "8">Date and time modified</field>
 Success response for PUT.
 </message>
 

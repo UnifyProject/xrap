@@ -34,7 +34,7 @@
     POST - Create a new, dynamically named resource in some parent.
         parent              string      Schema/type/name
         content_type        string      Content type
-        content_body        frame       New resource specification
+        content_body        longstr     New resource specification
 
     POST_OK - Success response for POST.
         status_code         number 2    Response status code 2xx
@@ -42,7 +42,7 @@
         etag                string      Opaque hash tag
         date_modified       number 8    Date and time modified
         content_type        string      Content type
-        content_body        frame       Resource contents
+        content_body        longstr     Resource contents
 
     GET - Retrieve a known resource.
         resource            string      Schema/type/name
@@ -53,7 +53,7 @@
     GET_OK - Success response for GET.
         status_code         number 2    Response status code 2xx
         content_type        string      Actual content type
-        content_body        frame       Resource specification
+        content_body        longstr     Resource specification
 
     GET_EMPTY - Conditional GET returned 304 Not Modified.
         status_code         number 2    Response status code 3xx
@@ -63,7 +63,7 @@
         if_unmodified_since  number 8   Update if same date
         if_match            string      Update if same ETag
         content_type        string      Content type
-        content_body        frame       New resource specification
+        content_body        longstr     New resource specification
 
     PUT_OK - Success response for PUT.
         status_code         number 2    Response status code 2xx
@@ -120,12 +120,16 @@ xrap_msg_t *
 int
     xrap_msg_send (xrap_msg_t **self_p, void *output);
 
+//  Send the xrap_msg to the output, and do not destroy it
+int
+    xrap_msg_send_again (xrap_msg_t *self, void *output);
+
 //  Send the POST to the output in one step
 int
     xrap_msg_send_post (void *output,
         char *parent,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the POST_OK to the output in one step
 int
@@ -135,7 +139,7 @@ int
         char *etag,
         uint64_t date_modified,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the GET to the output in one step
 int
@@ -150,7 +154,7 @@ int
     xrap_msg_send_get_ok (void *output,
         uint16_t status_code,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the GET_EMPTY to the output in one step
 int
@@ -164,7 +168,7 @@ int
         uint64_t if_unmodified_since,
         char *if_match,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the PUT_OK to the output in one step
 int
@@ -200,11 +204,11 @@ xrap_msg_t *
 void
     xrap_msg_dump (xrap_msg_t *self);
 
-//  Get/set the message address
+//  Get/set the message routing id
 zframe_t *
-    xrap_msg_address (xrap_msg_t *self);
+    xrap_msg_routing_id (xrap_msg_t *self);
 void
-    xrap_msg_set_address (xrap_msg_t *self, zframe_t *address);
+    xrap_msg_set_routing_id (xrap_msg_t *self, zframe_t *routing_id);
 
 //  Get the xrap_msg id and printable command
 int
@@ -227,10 +231,10 @@ void
     xrap_msg_set_content_type (xrap_msg_t *self, char *format, ...);
 
 //  Get/set the content_body field
-zframe_t *
+char *
     xrap_msg_content_body (xrap_msg_t *self);
 void
-    xrap_msg_set_content_body (xrap_msg_t *self, zframe_t *frame);
+    xrap_msg_set_content_body (xrap_msg_t *self, char *format, ...);
 
 //  Get/set the status_code field
 uint16_t

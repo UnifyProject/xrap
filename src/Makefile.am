@@ -11,6 +11,8 @@ libxrap_la_SOURCES = \
     platform.h \
     xrap_msg.c
 
+EXTRA_DIST = xrap_msg.xml xrap_msg.bnf license.xml generate
+
 AM_CFLAGS = -g
 AM_CPPFLAGS = -I$(top_srcdir)/include
 bin_PROGRAMS = xrap_selftest
