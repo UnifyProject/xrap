@@ -33,7 +33,7 @@ int
     xrap_msg_send_post (void *output,
         char *parent,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the POST_OK to the output in one step
 int
@@ -43,7 +43,7 @@ int
         char *etag,
         uint64_t date_modified,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the GET to the output in one step
 int
@@ -58,7 +58,7 @@ int
     xrap_msg_send_get_ok (void *output,
         uint16_t status_code,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the GET_EMPTY to the output in one step
 int
@@ -72,7 +72,7 @@ int
         uint64_t if_unmodified_since,
         char *if_match,
         char *content_type,
-        zframe_t *content_body);
+        char *content_body);
     
 //  Send the PUT_OK to the output in one step
 int
@@ -135,10 +135,10 @@ void
     xrap_msg_set_content_type (xrap_msg_t *self, char *format, ...);
 
 //  Get/set the content_body field
-zframe_t *
+char *
     xrap_msg_content_body (xrap_msg_t *self);
 void
-    xrap_msg_set_content_body (xrap_msg_t *self, zframe_t *frame);
+    xrap_msg_set_content_body (xrap_msg_t *self, char *format, ...);
 
 //  Get/set the status_code field
 uint16_t
@@ -243,7 +243,7 @@ EXAMPLE
 
     xrap_msg_set_parent (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
-    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_set_content_body (self, "Life is short but Now lasts for ever");
     //  Send twice from same object
     xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
@@ -254,7 +254,7 @@ EXAMPLE
         
         assert (streq (xrap_msg_parent (self), "Life is short but Now lasts for ever"));
         assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        assert (streq (xrap_msg_content_body (self), "Life is short but Now lasts for ever"));
         xrap_msg_destroy (&self);
     }
     self = xrap_msg_new (XRAP_MSG_POST_OK);
@@ -269,7 +269,7 @@ EXAMPLE
     xrap_msg_set_etag (self, "Life is short but Now lasts for ever");
     xrap_msg_set_date_modified (self, 123);
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
-    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_set_content_body (self, "Life is short but Now lasts for ever");
     //  Send twice from same object
     xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
@@ -283,7 +283,7 @@ EXAMPLE
         assert (streq (xrap_msg_etag (self), "Life is short but Now lasts for ever"));
         assert (xrap_msg_date_modified (self) == 123);
         assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        assert (streq (xrap_msg_content_body (self), "Life is short but Now lasts for ever"));
         xrap_msg_destroy (&self);
     }
     self = xrap_msg_new (XRAP_MSG_GET);
@@ -320,7 +320,7 @@ EXAMPLE
 
     xrap_msg_set_status_code (self, 123);
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
-    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_set_content_body (self, "Life is short but Now lasts for ever");
     //  Send twice from same object
     xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
@@ -331,7 +331,7 @@ EXAMPLE
         
         assert (xrap_msg_status_code (self) == 123);
         assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        assert (streq (xrap_msg_content_body (self), "Life is short but Now lasts for ever"));
         xrap_msg_destroy (&self);
     }
     self = xrap_msg_new (XRAP_MSG_GET_EMPTY);
@@ -364,7 +364,7 @@ EXAMPLE
     xrap_msg_set_if_unmodified_since (self, 123);
     xrap_msg_set_if_match (self, "Life is short but Now lasts for ever");
     xrap_msg_set_content_type (self, "Life is short but Now lasts for ever");
-    xrap_msg_set_content_body (self, zframe_new ("Captcha Diem", 12));
+    xrap_msg_set_content_body (self, "Life is short but Now lasts for ever");
     //  Send twice from same object
     xrap_msg_send_again (self, output);
     xrap_msg_send (&self, output);
@@ -377,7 +377,7 @@ EXAMPLE
         assert (xrap_msg_if_unmodified_since (self) == 123);
         assert (streq (xrap_msg_if_match (self), "Life is short but Now lasts for ever"));
         assert (streq (xrap_msg_content_type (self), "Life is short but Now lasts for ever"));
-        assert (zframe_streq (xrap_msg_content_body (self), "Captcha Diem"));
+        assert (streq (xrap_msg_content_body (self), "Life is short but Now lasts for ever"));
         xrap_msg_destroy (&self);
     }
     self = xrap_msg_new (XRAP_MSG_PUT_OK);
